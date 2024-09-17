@@ -1,0 +1,8 @@
+MOV AX,CX
+MOV BX, 5
+LOAD AX
+ADD DX
+SUB AX
+STORE AX
+MOV BX, -8
+param 7
