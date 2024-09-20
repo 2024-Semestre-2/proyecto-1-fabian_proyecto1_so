@@ -13,7 +13,8 @@ import java.util.Map;
  */
 public class BloqueProceso {
     
-    private static int id = 0;
+    private static int counter = 0;
+    private int id;
     private String estado;
     private String ir;
     private Map<String, Integer> registros = new HashMap<>();
@@ -30,14 +31,14 @@ public class BloqueProceso {
     /**
      * @return the id
      */
-    public static int getId() {
+    public int getId() {
         return id;
     }
 
     /**
      * @param aId the id to set
      */
-    public static void setId(int aId) {
+    public void setId(int aId) {
         id = aId;
     }
 
@@ -109,5 +110,9 @@ public class BloqueProceso {
      */
     public void setFinalMemoria(int finalMemoria) {
         this.finalMemoria = finalMemoria;
+    }
+
+    public void incrementar() {
+        id = ++counter;
     }
 }

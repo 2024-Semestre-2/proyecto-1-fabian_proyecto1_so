@@ -10,16 +10,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
 import java.awt.event.*;
-import java.io.File;
+
 import javax.swing.*;
 import java.io.*;
-import java.io.IOException;
 import java.awt.Desktop;
-import javax.swing.JOptionPane;
+
 import javax.swing.table.DefaultTableModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
@@ -38,13 +38,18 @@ public class Controlador{
     private PantallaMemoria pm;
     private Archivo archivoActual;
     private Memoria memoria;
-    private BloqueProceso bcp;
+    private ArrayList<BloqueProceso> listaBcp; //cambiar
+    private ArrayList<Archivo> listaArchivos; //cambiar
+    private BloqueProceso bcpActual;
     private Registro[] registros;
     private String[] identificadores;
     private String[] operaciones;
     private String ir;
     private Pattern patron;
     private String regex;
+    private ArrayList<Integer> pila; //cambiar
+    private boolean cmpResult;
+
     DefaultTableModel dtm = new DefaultTableModel(0, 0);
     DefaultTableModel dtm2 = new DefaultTableModel(0, 0);
 
@@ -63,12 +68,14 @@ public class Controlador{
         @Override
         public void actionPerformed(ActionEvent e) {
             int posicion = registros[buscarRegistro("PC")].getValor();
-            if(posicion<bcp.getFinalMemoria()){
+            if(posicion<bcpActual.getFinalMemoria()){
 
                 Instruccion instruccionActual = (Instruccion) memoria.getContenido()[posicion];
                 String operacion = instruccionActual.getOperacion();
                 int valor;
+                int valor2;
                 int valorActual;
+                int posicionActualizada;
                 int posicionRegistro1;
                 int posicionRegistro2;
                 String registroOrigen;
@@ -149,34 +156,44 @@ public class Controlador{
                         valor = registros[posicionRegistro1].getValor();
                         registroDestino = instruccionActual.getRegistroDestino();
                         posicionRegistro2 = buscarRegistro(registroDestino);
+                        valor2 = registros[posicionRegistro2].getValor();
                         registros[posicionRegistro2].setValor(valor);
-                        registros[posicionRegistro2].setValor(valorActual);
+                        registros[posicionRegistro2].setValor(valor2);
                         break;
                     case "INT":
-                        nuevaInstruccion = new Instruccion(division[0], division[1], actual);
-                        instrucciones.add(nuevaInstruccion);
+                        //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
+                        //instrucciones.add(nuevaInstruccion);
                         break;
                     case "JMP":
-                        valor = Integer.parseInt(division[1]);
-                        nuevaInstruccion = new Instruccion(division[0], valor, actual);
-                        instrucciones.add(nuevaInstruccion);
+                        valor = instruccionActual.getValor();
+                        posicionActualizada = posicion + valor;
+                        registros[buscarRegistro("PC")].setValor(posicionActualizada);
                         break;
                     case "CMP":
-                        nuevaInstruccion = new Instruccion(division[0], division[1], division[2], actual);
-                        instrucciones.add(nuevaInstruccion);
+                        registroOrigen = instruccionActual.getRegistroOrigen();
+                        posicionRegistro1 = buscarRegistro(registroOrigen);
+                        valor = registros[posicionRegistro1].getValor();
+                        registroDestino = instruccionActual.getRegistroDestino();
+                        posicionRegistro2 = buscarRegistro(registroDestino);
+                        valor2 = registros[posicionRegistro2].getValor();
+                        cmpResult = valor == valor2;
                         break;
                     case "JE":
-                        valor = Integer.parseInt(division[1]);
-                        nuevaInstruccion = new Instruccion(division[0], valor, actual);
-                        instrucciones.add(nuevaInstruccion);
+                        if(cmpResult){
+                            valor = instruccionActual.getValor();
+                            posicionActualizada = posicion + valor;
+                            registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                        }
                         break;
                     case "JNE":
-                        valor = Integer.parseInt(division[1]);
-                        nuevaInstruccion = new Instruccion(division[0], valor, actual);
-                        instrucciones.add(nuevaInstruccion);
+                        if(!cmpResult){
+                            valor = instruccionActual.getValor();
+                            posicionActualizada = posicion + valor;
+                            registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                        }
                         break;
                     case "PARAM":
-                        param1 = Integer.parseInt(division[1]);
+                        /*param1 = Integer.parseInt(division[1]);
                         nuevaInstruccion = new Instruccion(division[0], valor, actual);
                         if(division.length == 4){
                             param2 = Integer.parseInt(division[2]);
@@ -191,50 +208,27 @@ public class Controlador{
                         }else{
                             nuevaInstruccion = new Instruccion(division[0], param1, actual);
                         }
-                        break;
+                        */break;
                     case "PUSH":
-                        nuevaInstruccion = new Instruccion(division[0], division[1], actual);
-                        instrucciones.add(nuevaInstruccion);
+                        //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
+                        //instrucciones.add(nuevaInstruccion);
                         break;
                     case "POP":
-                        nuevaInstruccion = new Instruccion(division[0], division[1], actual);
-                        instrucciones.add(nuevaInstruccion);
+                        //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
+                        //instrucciones.add(nuevaInstruccion);
                         break;
                     default:
                         System.out.println("A");
                         JOptionPane.showMessageDialog (null, "Error semantico", "Error", JOptionPane.ERROR_MESSAGE);
                 }
 
-                if(bcp.getEstado().equals("Preparado")){
-                    bcp.setEstado("Ejecutando");
-                }
-                if(instruccionActual.getOperacion().equals("MOV")){
-                    registros[buscarRegistro(instruccionActual.getRegistroDestino())].setValor(instruccionActual.getValor());
-                }else if(instruccionActual.getOperacion().equals("ADD")){
-                    int posicion2 = buscarRegistro("AC");
-                    int posicion3 = buscarRegistro(instruccionActual.getRegistroOrigen());
-                    int valorActual = registros[posicion2].getValor();
-                    valorActual+=registros[posicion3].getValor();
-                    registros[buscarRegistro(instruccionActual.getRegistroDestino())].setValor(valorActual);
-                }else if(instruccionActual.getOperacion().equals("SUB")){
-                    int posicion2 = buscarRegistro("AC");
-                    int posicion3 = buscarRegistro(instruccionActual.getRegistroOrigen());
-                    int valorActual = registros[posicion2].getValor();
-                    valorActual-=registros[posicion3].getValor();
-                    registros[buscarRegistro(instruccionActual.getRegistroDestino())].setValor(valorActual);
-                }else if(instruccionActual.getOperacion().equals("LOAD")){
-                    int posicion3 = buscarRegistro(instruccionActual.getRegistroOrigen());
-                    int valorActual = registros[posicion3].getValor();
-                    registros[buscarRegistro(instruccionActual.getRegistroDestino())].setValor(valorActual);
-                }else{
-                    int posicion2 = buscarRegistro("AC");
-                    int valorActual = registros[posicion2].getValor();
-                    registros[buscarRegistro(instruccionActual.getRegistroOrigen())].setValor(valorActual);
+                if(bcpActual.getEstado().equals("Preparado")){
+                    bcpActual.setEstado("Ejecutando");
                 }
                 posicion++;
                 registros[buscarRegistro("PC")].setValor(posicion);
-                if(posicion==bcp.getFinalMemoria()){
-                    bcp.setEstado("Terminado");
+                if(posicion==bcpActual.getFinalMemoria()){
+                    bcpActual.setEstado("Terminado");
                 }else{
                     Instruccion siguienteInstruccion = (Instruccion) memoria.getContenido()[posicion];
                     ir = siguienteInstruccion.getLinea();
@@ -274,8 +268,12 @@ public class Controlador{
                 }
 				System.out.println(formato);
 			}
-            archivoActual = new Archivo(contenido, formato);
-            pp.getjTextArea1().setText(contenido);
+            Archivo archivoNuevo = new Archivo(contenido, formato);
+            if(listaArchivos.size()==0){
+                archivoActual = archivoNuevo;
+                pp.getjTextArea1().setText(contenido);
+            }
+            listaArchivos.add(archivoNuevo);
         }
     };
 
@@ -286,6 +284,7 @@ public class Controlador{
             pm.setVisible(true);
         }
     };
+
     ActionListener btnConfiguracion_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -323,31 +322,39 @@ public class Controlador{
     ActionListener btnCargar_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            ArrayList<Instruccion> instrucciones;
-            String[] listaTemporal = construirLista();
-            boolean validacion = validarInstruccion(listaTemporal);
-            if(validacion){
-                instrucciones = construirListaInstrucciones(listaTemporal);
-                Random random = new Random();
-                int min = memoria.getLimite();
-                int max = 1024;
-                int posicionAleatoria = random.nextInt(max - min + 1) + min;
-                for(int i = 0; i<instrucciones.size(); i++){
-                    memoria.getContenido()[posicionAleatoria]=instrucciones.get(i);
-                    posicionAleatoria++;
+            if(listaBcp.size() < 5){
+                ArrayList<Instruccion> instrucciones;
+                String[] listaTemporal = construirLista();
+                boolean validacion = validarInstruccion(listaTemporal);
+                if(validacion){
+                    instrucciones = construirListaInstrucciones(listaTemporal);
+                    Random random = new Random();
+                    int min = memoria.getLimite();
+                    int max = 1024;
+                    int posicionAleatoria = random.nextInt(max - min + 1) + min;
+                    for(int i = 0; i<instrucciones.size(); i++){
+                        memoria.getContenido()[posicionAleatoria]=instrucciones.get(i);
+                        posicionAleatoria++;
+                    }
+                    BloqueProceso bcpNuevo = new BloqueProceso("nuevo","-", 0, 0);
+                    bcpNuevo.setRegistros(inicializarBcpHash());
+                    posicionAleatoria-=instrucciones.size();
+                    bcpNuevo.setInicioMemoria(posicionAleatoria);
+                    bcpNuevo.setFinalMemoria(posicionAleatoria+instrucciones.size());
+                    ir = instrucciones.get(0).getLinea();
+                    registros[buscarRegistro("PC")].setValor(posicionAleatoria);
+                    bcpNuevo.getRegistros().replace("PC", posicionAleatoria);
+                    bcpNuevo.setEstado("Preparado");
+                    if(listaBcp.size() == 0){
+                        bcpActual = bcpNuevo;
+                        actualizarMemoriaSO();
+                        actualizarTabla();
+                    }
+                }else{
+                    JOptionPane.showMessageDialog (null, "Error semantico", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                posicionAleatoria-=instrucciones.size();
-                bcp.setInicioMemoria(posicionAleatoria);
-                bcp.setFinalMemoria(posicionAleatoria+instrucciones.size());
-                ir = instrucciones.get(0).getLinea();
-                registros[buscarRegistro("PC")].setValor(posicionAleatoria);
-                bcp.getRegistros().replace("PC", posicionAleatoria);
-                bcp.setEstado("Preparado");
-                actualizarMemoriaSO();
-                actualizarTabla();
             }else{
-                System.out.println("B");
-                JOptionPane.showMessageDialog (null, "Error semantico", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog (null, "La memoria ha alcanzado el límite de procesos. Por favor espere a que se libere la memoria", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     };
@@ -377,10 +384,12 @@ public class Controlador{
     
         // Compilar el patrón una sola vez para mejor rendimiento
         this.patron = Pattern.compile(regex);
+        this.pila = new ArrayList<>();
+        this.listaBcp = new ArrayList<>();
+        this.listaArchivos = new ArrayList<>();
         this.identificadores = new String[]{"AX", "BX", "CX", "DX", "AC", "PC"};
         this.operaciones = new String[]{"MOV", "LOAD", "STORE", "ADD", "SUB"};
         this.registros = new Registro[6];
-        this.bcp = new BloqueProceso("nuevo","-", 0, 0);
         inicializarRegistros();
         gestionarBotones();
         String columnas[] = new String[] {"ID", "Estado","AX", "BX", "CX", "DX", "AC", "PC", "IR", "Inicio", "Final"};
@@ -538,12 +547,13 @@ public class Controlador{
 
     public void actualizarTablaMemoria(){
         dtm2 = new DefaultTableModel(0, 0);
-        String columnas2[] = new String[] {"Memoria"};
+        String columnas2[] = new String[] {"Posición", "Memoria"};
         dtm2.setColumnIdentifiers(columnas2);
         pm.getjTable1().setModel(dtm2);
         pm.getjScrollPane1().setViewportView(pm.getjTable1());
         for(int i = 0; i<memoria.getContenido().length; i++){
             Vector<Object> vector = new Vector<>();
+            vector.add(i);
             vector.add(memoria.getContenido()[i]);
             dtm2.addRow(vector);
         }
@@ -556,19 +566,24 @@ public class Controlador{
                 Registro registroActual = new Registro(i, "contador", 0);
                 registros[cont]=registroActual;
                 cont++;
-                bcp.getRegistros().put(i, 0);
             }else if(i.equals("AC")){
                 Registro registroActual = new Registro(i, "acumulador", 0);
                 registros[cont]=registroActual;
                 cont++;
-                bcp.getRegistros().put(i, 0);
             }else{
                 Registro registroActual = new Registro(i, "general", 0);
                 registros[cont]=registroActual;
                 cont++;
-                bcp.getRegistros().put(i, 0);
             }
         }
+    }
+
+    public Map<String, Integer> inicializarBcpHash(){
+        Map<String, Integer> registros = new HashMap<>();
+        for(String i : identificadores){
+           registros.put(i, 0);
+        }
+        return registros;
     }
 
     public void actualizarMemoriaSO(){
@@ -577,15 +592,15 @@ public class Controlador{
         int max = memoria.getLimite();
         int min = 0;
         int posicionAleatoria = random.nextInt(max - min + 1) + min;
-        memoria.getContenido()[posicionAleatoria] = bcp.getId();
+        memoria.getContenido()[posicionAleatoria] = bcpActual.getId();
         posicionAleatoria++;
-        memoria.getContenido()[posicionAleatoria] = bcp.getEstado();
+        memoria.getContenido()[posicionAleatoria] = bcpActual.getEstado();
         posicionAleatoria++;
-        memoria.getContenido()[posicionAleatoria] = bcp.getInicioMemoria();
+        memoria.getContenido()[posicionAleatoria] = bcpActual.getInicioMemoria();
         posicionAleatoria++;
-        memoria.getContenido()[posicionAleatoria] = bcp.getFinalMemoria();
+        memoria.getContenido()[posicionAleatoria] = bcpActual.getFinalMemoria();
         posicionAleatoria++;
-        for (Map.Entry<String, Integer> entry : bcp.getRegistros().entrySet()) {
+        for (Map.Entry<String, Integer> entry : bcpActual.getRegistros().entrySet()) {
             memoria.getContenido()[posicionAleatoria] = entry.getKey() + " = " + entry.getValue().toString();
             posicionAleatoria++;
         }
@@ -596,7 +611,7 @@ public class Controlador{
     public void actualizarBcp(){
         for(int i = 0; i<registros.length; i++){
             String id = registros[i].getIdentificador();
-            bcp.getRegistros().replace(id, registros[i].getValor());
+            bcpActual.getRegistros().replace(id, registros[i].getValor());
         }
     }
 
@@ -619,7 +634,7 @@ public class Controlador{
     }
 
     public void actualizarTabla(){
-        dtm.addRow(new Object[] { bcp.getId(), bcp.getEstado(), bcp.getRegistros().get("AX"), bcp.getRegistros().get("BX"), bcp.getRegistros().get("CX"), bcp.getRegistros().get("DX"), bcp.getRegistros().get("AC"), bcp.getRegistros().get("PC"), this.ir, bcp.getInicioMemoria(),bcp.getFinalMemoria()});
+        dtm.addRow(new Object[] { bcpActual.getId(), bcpActual.getEstado(), bcpActual.getRegistros().get("AX"), bcpActual.getRegistros().get("BX"), bcpActual.getRegistros().get("CX"), bcpActual.getRegistros().get("DX"), bcpActual.getRegistros().get("AC"), bcpActual.getRegistros().get("PC"), this.ir, bcpActual.getInicioMemoria(),bcpActual.getFinalMemoria()});
     }
 
     public boolean validarRegistro(String registro) {
