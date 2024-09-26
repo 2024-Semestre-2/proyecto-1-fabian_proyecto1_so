@@ -18,6 +18,7 @@ public class Instruccion {
     private String linea;
     private String operacion;
     private String llamada;
+    private int cantidadParam;
 
     public Instruccion(String operacion, String registroDestino, String registroOrigen, String linea){
         this.registroDestino = registroDestino;
@@ -43,6 +44,20 @@ public class Instruccion {
         this.valor = valor;
         this.linea = linea;
         this.operacion = operacion;
+    }
+
+        /**
+     * @return the registroDestino
+     */
+    public int getCantidadParam() {
+        return cantidadParam;
+    }
+
+    /**
+     * @param registroDestino the registroDestino to set
+     */
+    public void setCantidadParam(int cantidadParam) {
+        this.cantidadParam = cantidadParam;
     }
 
     /**

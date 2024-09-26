@@ -22,10 +22,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
 import java.util.Vector;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -47,7 +49,7 @@ public class Controlador{
     private String ir;
     private Pattern patron;
     private String regex;
-    private ArrayList<Integer> pila; //cambiar
+    private Stack<Integer> pila; //cambiar
     private boolean cmpResult;
 
     DefaultTableModel dtm = new DefaultTableModel(0, 0);
@@ -163,6 +165,14 @@ public class Controlador{
                     case "INT":
                         //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
                         //instrucciones.add(nuevaInstruccion);
+                        llamada = instruccionActual.getLlamada();
+                        if(llamada.equals("20H")){
+
+                        }else if(llamada.equals("10H")){
+
+                        }else{
+
+                        }
                         break;
                     case "JMP":
                         valor = instruccionActual.getValor();
@@ -193,29 +203,51 @@ public class Controlador{
                         }
                         break;
                     case "PARAM":
-                        /*param1 = Integer.parseInt(division[1]);
-                        nuevaInstruccion = new Instruccion(division[0], valor, actual);
-                        if(division.length == 4){
-                            param2 = Integer.parseInt(division[2]);
-                            param3 = Integer.parseInt(division[3]);
-                            nuevaInstruccion = new Instruccion(division[0], param1, actual);
-                            nuevaInstruccion.setValor2(param2);
-                            nuevaInstruccion.setValor3(param3);
-                        }else if(division.length == 3){
-                            param2 = Integer.parseInt(division[2]);
-                            nuevaInstruccion = new Instruccion(division[0], param1, actual);
-                            nuevaInstruccion.setValor2(param2);
+                        param1 = instruccionActual.getValor();
+                        param2 = instruccionActual.getValor2();
+                        param3 = instruccionActual.getValor3();
+                        if(instruccionActual.getCantidadParam() == 3){
+                            if(pila.size()<=5 && pila.size()-3 > 0){
+                                pila.push(param1);
+                                pila.push(param2);
+                                pila.push(param3);
+                            }else{
+                                error();
+                            }
+                        }else if(instruccionActual.getCantidadParam() == 2){
+                            if(pila.size()<=5 && pila.size()-2 > 0){
+                                pila.push(param1);
+                                pila.push(param2);
+                            }else{
+                                error();
+                            }
                         }else{
-                            nuevaInstruccion = new Instruccion(division[0], param1, actual);
+                            if(pila.size()<=5 && pila.size()-1 > 0){
+                                pila.push(param1);
+                            }else{
+                                error();
+                            }
                         }
-                        */break;
+                        break;
                     case "PUSH":
-                        //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
-                        //instrucciones.add(nuevaInstruccion);
+                        if(pila.size() < 5){
+                            registroOrigen = instruccionActual.getLlamada();
+                            posicionRegistro1 = buscarRegistro(registroOrigen);
+                            valorActual = registros[posicionRegistro1].getValor();
+                            pila.push(valorActual);
+                        }else{
+                            error();
+                        }
                         break;
                     case "POP":
-                        //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
-                        //instrucciones.add(nuevaInstruccion);
+                        if(!pila.isEmpty()){
+                            registroDestino = instruccionActual.getLlamada();
+                            posicionRegistro1 = buscarRegistro(registroDestino);
+                            valorActual = pila.pop();
+                            registros[posicionRegistro1].setValor(valorActual);
+                        }else{
+                            error();
+                        }
                         break;
                     default:
                         System.out.println("A");
@@ -240,6 +272,12 @@ public class Controlador{
                 inicializarRegistros();
                 actualizarMemoriaSO();
                 actualizarTabla();
+            }
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
         }
     };
@@ -384,7 +422,7 @@ public class Controlador{
     
         // Compilar el patrón una sola vez para mejor rendimiento
         this.patron = Pattern.compile(regex);
-        this.pila = new ArrayList<>();
+        this.pila = new Stack<Integer>();
         this.listaBcp = new ArrayList<>();
         this.listaArchivos = new ArrayList<>();
         this.identificadores = new String[]{"AX", "BX", "CX", "DX", "AC", "PC"};
@@ -396,7 +434,7 @@ public class Controlador{
         dtm.setColumnIdentifiers(columnas);
         pp.getjTable1().setModel(dtm);
         pp.getJScrollPane2().setViewportView(pp.getjTable1());
-        actualizarTabla();
+        //actualizarTabla();
         String columnas2[] = new String[] {"Memoria"};
         dtm2.setColumnIdentifiers(columnas2);
         pm.getjTable1().setModel(dtm2);
@@ -499,12 +537,15 @@ public class Controlador{
                         nuevaInstruccion = new Instruccion(division[0], param1, actual);
                         nuevaInstruccion.setValor2(param2);
                         nuevaInstruccion.setValor3(param3);
+                        nuevaInstruccion.setCantidadParam(3);
                     }else if(division.length == 3){
                         param2 = Integer.parseInt(division[2]);
                         nuevaInstruccion = new Instruccion(division[0], param1, actual);
                         nuevaInstruccion.setValor2(param2);
+                        nuevaInstruccion.setCantidadParam(2);
                     }else{
                         nuevaInstruccion = new Instruccion(division[0], param1, actual);
+                        nuevaInstruccion.setCantidadParam(1);
                     }
                     break;
                 case "PUSH":
@@ -557,6 +598,10 @@ public class Controlador{
             vector.add(memoria.getContenido()[i]);
             dtm2.addRow(vector);
         }
+    }
+
+    public void error(){
+
     }
 
     public void inicializarRegistros(){
