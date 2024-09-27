@@ -10,13 +10,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
 import java.awt.event.*;
-
 import javax.swing.*;
 import java.io.*;
 import java.awt.Desktop;
-
 import javax.swing.table.DefaultTableModel;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,18 +36,21 @@ public class Controlador{
     private PantallaConfiguracion pconfig;
     private PantallaMemoria pm;
     private Archivo archivoActual;
-    private Memoria memoria;
-    private ArrayList<BloqueProceso> listaBcp; //cambiar
-    private ArrayList<Archivo> listaArchivos; //cambiar
+    private Memoria memoriaPrincipal;
+    private Memoria memoriaSecundaria;
+    private ArrayList<BloqueProceso> listaBcp;
+    private ArrayList<Archivo> listaArchivos;
     private BloqueProceso bcpActual;
     private Registro[] registros;
     private String[] identificadores;
-    private String[] operaciones;
     private String ir;
     private Pattern patron;
     private String regex;
-    private Stack<Integer> pila; //cambiar
+    private Stack<Integer> pila;
     private boolean cmpResult;
+    private int tiempoEjecucion;
+    private boolean espera;
+    
 
     DefaultTableModel dtm = new DefaultTableModel(0, 0);
     DefaultTableModel dtm2 = new DefaultTableModel(0, 0);
@@ -64,6 +64,7 @@ public class Controlador{
         pm.getBtnCerrar().addActionListener(btnCerrar_ActionPerformed);
         pconfig.getBtnVolver().addActionListener(btnVolver_ActionPerformed);
         pconfig.getBtnGuardar().addActionListener(btnGuardar_ActionPerformed);
+        pp.getTextFieldEntrada().addActionListener(textFieldEntrada_AntionPerformed);
     }
 
     ActionListener btnInstruccion_ActionPerformed = new ActionListener() {
@@ -72,7 +73,7 @@ public class Controlador{
             int posicion = registros[buscarRegistro("PC")].getValor();
             if(posicion<bcpActual.getFinalMemoria()){
 
-                Instruccion instruccionActual = (Instruccion) memoria.getContenido()[posicion];
+                Instruccion instruccionActual = (Instruccion) memoriaPrincipal.getContenido()[posicion];
                 String operacion = instruccionActual.getOperacion();
                 int valor;
                 int valor2;
@@ -167,11 +168,25 @@ public class Controlador{
                         //instrucciones.add(nuevaInstruccion);
                         llamada = instruccionActual.getLlamada();
                         if(llamada.equals("20H")){
-
+                            bcpActual.setEstado("Terminado");
                         }else if(llamada.equals("10H")){
-
+                            posicionRegistro1 = buscarRegistro("DX");
+                            valor = registros[posicionRegistro1].getValor();
+                            String impresion = String.valueOf(valor);
+                            pp.getTextAreaPantalla().setText(impresion+"\n");
                         }else{
-
+                            if(!espera){
+                                posicionRegistro1 = buscarRegistro("DX");
+                                String impresion = pp.getTextFieldEntrada().getText();
+                                valor = Integer.parseInt(impresion);
+                                registros[posicionRegistro1].setValor(valor);
+                                espera = false;
+                                bcpActual.setEstado("Ejecutando");
+                            }else{
+                                if(!(bcpActual.getEstado().equals("Esperando"))){
+                                    bcpActual.setEstado("Esperando");
+                                }
+                            }
                         }
                         break;
                     case "JMP":
@@ -257,13 +272,16 @@ public class Controlador{
                 if(bcpActual.getEstado().equals("Preparado")){
                     bcpActual.setEstado("Ejecutando");
                 }
-                posicion++;
-                registros[buscarRegistro("PC")].setValor(posicion);
                 if(posicion==bcpActual.getFinalMemoria()){
                     bcpActual.setEstado("Terminado");
+                    error();
                 }else{
-                    Instruccion siguienteInstruccion = (Instruccion) memoria.getContenido()[posicion];
-                    ir = siguienteInstruccion.getLinea();
+                    if(!(bcpActual.getEstado().equals("Esperando"))){
+                        posicion++;
+                        registros[buscarRegistro("PC")].setValor(posicion);
+                        Instruccion siguienteInstruccion = (Instruccion) memoriaPrincipal.getContenido()[posicion];
+                        ir = siguienteInstruccion.getLinea();
+                    }
                 }
                 actualizarBcp();
                 actualizarMemoriaSO();
@@ -275,6 +293,7 @@ public class Controlador{
             }
             try {
                 TimeUnit.SECONDS.sleep(1);
+                tiempoEjecucion += 1;
             } catch (InterruptedException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -322,6 +341,13 @@ public class Controlador{
             pm.setVisible(true);
         }
     };
+    
+    ActionListener textFieldEntrada_AntionPerformed = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            espera = true;
+        }
+    };
 
     ActionListener btnConfiguracion_ActionPerformed = new ActionListener() {
         @Override
@@ -351,7 +377,7 @@ public class Controlador{
         @Override
         public void actionPerformed(ActionEvent e) {
             int valor = Integer.parseInt(pconfig.getjTextField1().getText());
-            memoria.setLimite(valor);
+            memoriaPrincipal.setLimite(valor);
             pp.setVisible(true);
             pm.setVisible(false);
         }
@@ -367,11 +393,16 @@ public class Controlador{
                 if(validacion){
                     instrucciones = construirListaInstrucciones(listaTemporal);
                     Random random = new Random();
-                    int min = memoria.getLimite();
+                    int min = memoriaPrincipal.getLimite();
                     int max = 1024;
                     int posicionAleatoria = random.nextInt(max - min + 1) + min;
+                    while(!disponibilidad(posicionAleatoria, instrucciones.size())){
+                        random = new Random();
+                        max = 1024;
+                        posicionAleatoria = random.nextInt(max - min + 1) + min;
+                    }
                     for(int i = 0; i<instrucciones.size(); i++){
-                        memoria.getContenido()[posicionAleatoria]=instrucciones.get(i);
+                        memoriaPrincipal.getContenido()[posicionAleatoria]=instrucciones.get(i);
                         posicionAleatoria++;
                     }
                     BloqueProceso bcpNuevo = new BloqueProceso("nuevo","-", 0, 0);
@@ -383,16 +414,17 @@ public class Controlador{
                     registros[buscarRegistro("PC")].setValor(posicionAleatoria);
                     bcpNuevo.getRegistros().replace("PC", posicionAleatoria);
                     bcpNuevo.setEstado("Preparado");
-                    if(listaBcp.size() == 0){
+                    if(bcpActual == null){
                         bcpActual = bcpNuevo;
-                        actualizarMemoriaSO();
                         actualizarTabla();
                     }
+                    actualizarMemoriaSO();
+                    listaBcp.add(bcpNuevo);
                 }else{
                     JOptionPane.showMessageDialog (null, "Error semantico", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }else{
-                JOptionPane.showMessageDialog (null, "La memoria ha alcanzado el límite de procesos. Por favor espere a que se libere la memoria", "Error", JOptionPane.ERROR_MESSAGE);
+                error();
             }
         }
     };
@@ -401,8 +433,9 @@ public class Controlador{
         this.pp = new PantallaPrincipal();
         this.pconfig = new PantallaConfiguracion();
         this.pm = new PantallaMemoria();
-        this.memoria = new Memoria();
+        this.memoriaPrincipal = new Memoria();
         this.ir = "-";
+        this.espera = false;
         this.regex = "^(LOAD\\s+(AX|BX|CX|DX)|" +
                "STORE\\s+(AX|BX|CX|DX)|" +
                "MOV\\s+(AX|BX|CX|DX)\\s+(AX|BX|CX|DX)|" +
@@ -426,20 +459,18 @@ public class Controlador{
         this.listaBcp = new ArrayList<>();
         this.listaArchivos = new ArrayList<>();
         this.identificadores = new String[]{"AX", "BX", "CX", "DX", "AC", "PC"};
-        this.operaciones = new String[]{"MOV", "LOAD", "STORE", "ADD", "SUB"};
         this.registros = new Registro[6];
         inicializarRegistros();
-        gestionarBotones();
         String columnas[] = new String[] {"ID", "Estado","AX", "BX", "CX", "DX", "AC", "PC", "IR", "Inicio", "Final"};
         dtm.setColumnIdentifiers(columnas);
         pp.getjTable1().setModel(dtm);
         pp.getJScrollPane2().setViewportView(pp.getjTable1());
-        //actualizarTabla();
         String columnas2[] = new String[] {"Memoria"};
         dtm2.setColumnIdentifiers(columnas2);
         pm.getjTable1().setModel(dtm2);
         pm.getjScrollPane1().setViewportView(pm.getjTable1());
         this.pp.setVisible(true);
+        gestionarBotones();
     }
 
     public ArrayList<Instruccion> construirListaInstrucciones(String[] listaTemporal){
@@ -572,6 +603,23 @@ public class Controlador{
         String[] resultado = correccion2.split("\\n+");
         return resultado;
     }
+    
+    public boolean disponibilidad(int posicion, int cantidad){
+        int cont = 0;
+        boolean disposicion = true;
+        boolean resultado = false;
+        for(int i = posicion; i<memoriaPrincipal.getContenido().length; i++){
+            if(memoriaPrincipal.getContenido()[i] == null){
+                disposicion = false;
+                break;
+            }
+            cont++;
+        }
+        if(disposicion && cont == cantidad){
+            resultado = true;
+        }
+        return resultado;
+    }
 
     // Método que recibe una lista de instrucciones y valida si todas son correctas
     public boolean validarInstruccion(String[] instrucciones) {
@@ -582,7 +630,6 @@ public class Controlador{
                 return false; // Si alguna no coincide, retorna false
             }
         }
-        System.out.println("salio");
         return true; // Si todas coinciden, retorna true
     }
 
@@ -592,10 +639,17 @@ public class Controlador{
         dtm2.setColumnIdentifiers(columnas2);
         pm.getjTable1().setModel(dtm2);
         pm.getjScrollPane1().setViewportView(pm.getjTable1());
-        for(int i = 0; i<memoria.getContenido().length; i++){
+        for(int i = 0; i<memoriaPrincipal.getContenido().length; i++){
             Vector<Object> vector = new Vector<>();
             vector.add(i);
-            vector.add(memoria.getContenido()[i]);
+            Class<?> objClass = memoriaPrincipal.getContenido()[i].getClass();
+            String clase = objClass.getSimpleName();
+            if(clase.equals("Instruccion")){
+                Instruccion instruccion = (Instruccion)memoriaPrincipal.getContenido()[i];
+                vector.add(instruccion.getLinea());
+            }else{
+                vector.add(memoriaPrincipal.getContenido()[i]);
+            }
             dtm2.addRow(vector);
         }
     }
@@ -632,24 +686,24 @@ public class Controlador{
     }
 
     public void actualizarMemoriaSO(){
-        Arrays.fill(memoria.getContenido(), 0, memoria.getLimite(), null);
+        Arrays.fill(memoriaPrincipal.getContenido(), 0, memoriaPrincipal.getLimite(), null);
         Random random = new Random();
-        int max = memoria.getLimite();
+        int max = memoriaPrincipal.getLimite();
         int min = 0;
         int posicionAleatoria = random.nextInt(max - min + 1) + min;
-        memoria.getContenido()[posicionAleatoria] = bcpActual.getId();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getId();
         posicionAleatoria++;
-        memoria.getContenido()[posicionAleatoria] = bcpActual.getEstado();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getEstado();
         posicionAleatoria++;
-        memoria.getContenido()[posicionAleatoria] = bcpActual.getInicioMemoria();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getInicioMemoria();
         posicionAleatoria++;
-        memoria.getContenido()[posicionAleatoria] = bcpActual.getFinalMemoria();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getFinalMemoria();
         posicionAleatoria++;
         for (Map.Entry<String, Integer> entry : bcpActual.getRegistros().entrySet()) {
-            memoria.getContenido()[posicionAleatoria] = entry.getKey() + " = " + entry.getValue().toString();
+            memoriaPrincipal.getContenido()[posicionAleatoria] = entry.getKey() + " = " + entry.getValue().toString();
             posicionAleatoria++;
         }
-        memoria.getContenido()[posicionAleatoria] = ir;
+        memoriaPrincipal.getContenido()[posicionAleatoria] = ir;
         actualizarTablaMemoria();
     }
 
@@ -658,15 +712,6 @@ public class Controlador{
             String id = registros[i].getIdentificador();
             bcpActual.getRegistros().replace(id, registros[i].getValor());
         }
-    }
-
-    public int validarOperacion(String operacion) {
-        for(int i = 0; i<operaciones.length; i++){
-            if (operaciones[i].equals(operacion)) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     public int buscarRegistro(String identificador){
@@ -705,5 +750,14 @@ public class Controlador{
             }
         }
         return true;
+    }
+    
+    public boolean isArrayEmpty(Object[] array) {
+        for (Object element : array) {
+            if (element != null) {
+                return false;  // Si encuentras un elemento no nulo, el arreglo no está vacío.
+            }
+        }
+        return true;  // Todas las posiciones son nulas, el arreglo está "vacío".
     }
 }
