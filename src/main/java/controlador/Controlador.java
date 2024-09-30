@@ -8,11 +8,8 @@ import Vista.PantallaMemoria;
 import Vista.PantallaPrincipal;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.FlowLayout;
-import java.awt.event.*;
 import javax.swing.*;
 import java.io.*;
-import java.awt.Desktop;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +18,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.TimeUnit;
@@ -65,239 +61,32 @@ public class Controlador{
         pconfig.getBtnVolver().addActionListener(btnVolver_ActionPerformed);
         pconfig.getBtnGuardar().addActionListener(btnGuardar_ActionPerformed);
         pp.getTextFieldEntrada().addActionListener(textFieldEntrada_AntionPerformed);
+        pp.getBtnAutomatico().addActionListener(btnAutomatico_ActionPerformed);
     }
 
     ActionListener btnInstruccion_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int posicion = registros[buscarRegistro("PC")].getValor();
-            if(posicion<bcpActual.getFinalMemoria()){
-
-                Instruccion instruccionActual = (Instruccion) memoriaPrincipal.getContenido()[posicion];
-                String operacion = instruccionActual.getOperacion();
-                int valor;
-                int valor2;
-                int valorActual;
-                int posicionActualizada;
-                int posicionRegistro1;
-                int posicionRegistro2;
-                String registroOrigen;
-                String registroDestino;
-                String llamada;
-                int param1;
-                int param2;
-                int param3;
-
-
-                switch(operacion) {
-                    case "MOV":
-                        if(instruccionActual.getRegistroOrigen() == null){
-                            valor = instruccionActual.getValor();
-                            registroDestino = instruccionActual.getRegistroDestino();
-                            posicionRegistro1 = buscarRegistro(registroDestino);
-                            registros[posicionRegistro1].setValor(valor);
-                        }else{
-                            registroOrigen = instruccionActual.getRegistroOrigen();
-                            posicionRegistro1 = buscarRegistro(registroOrigen);
-                            valor = registros[posicionRegistro1].getValor();
-                            registroDestino = instruccionActual.getRegistroDestino();
-                            posicionRegistro2 = buscarRegistro(registroDestino);
-                            registros[posicionRegistro2].setValor(valor);
-                        }
-                        break;
-                    case "ADD":
-                        registroOrigen = instruccionActual.getRegistroOrigen();
-                        posicionRegistro1 = buscarRegistro(registroOrigen);
-                        valor = registros[posicionRegistro1].getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        valorActual = registros[posicionRegistro2].getValor();
-                        registros[posicionRegistro2].setValor(valorActual+valor);
-                        break;
-                    case "SUB":
-                        registroOrigen = instruccionActual.getRegistroOrigen();
-                        posicionRegistro1 = buscarRegistro(registroOrigen);
-                        valor = registros[posicionRegistro1].getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        valorActual = registros[posicionRegistro2].getValor();
-                        registros[posicionRegistro2].setValor(valorActual-valor);
-                        break;
-                    case "STORE":
-                        registroOrigen = instruccionActual.getRegistroDestino();
-                        posicionRegistro1 = buscarRegistro(registroOrigen);
-                        valor = registros[posicionRegistro1].getValor();
-                        registroDestino = instruccionActual.getRegistroOrigen();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        registros[posicionRegistro2].setValor(valor);
-                        break;
-                    case "LOAD":
-                        registroOrigen = instruccionActual.getRegistroOrigen();
-                        posicionRegistro1 = buscarRegistro(registroOrigen);
-                        valor = registros[posicionRegistro1].getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        registros[posicionRegistro2].setValor(valor);
-                        break;
-                    case "INC":
-                        valor = instruccionActual.getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        valorActual = registros[posicionRegistro2].getValor();
-                        registros[posicionRegistro2].setValor(valorActual+valor);
-                        break;
-                    case "DEC":
-                        valor = instruccionActual.getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        valorActual = registros[posicionRegistro2].getValor();
-                        registros[posicionRegistro2].setValor(valorActual-valor);
-                        break;
-                    case "SWAP":
-                        registroOrigen = instruccionActual.getRegistroOrigen();
-                        posicionRegistro1 = buscarRegistro(registroOrigen);
-                        valor = registros[posicionRegistro1].getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        valor2 = registros[posicionRegistro2].getValor();
-                        registros[posicionRegistro2].setValor(valor);
-                        registros[posicionRegistro2].setValor(valor2);
-                        break;
-                    case "INT":
-                        //nuevaInstruccion = new Instruccion(division[0], division[1], actual);
-                        //instrucciones.add(nuevaInstruccion);
-                        llamada = instruccionActual.getLlamada();
-                        if(llamada.equals("20H")){
-                            bcpActual.setEstado("Terminado");
-                        }else if(llamada.equals("10H")){
-                            posicionRegistro1 = buscarRegistro("DX");
-                            valor = registros[posicionRegistro1].getValor();
-                            String impresion = String.valueOf(valor);
-                            pp.getTextAreaPantalla().setText(impresion+"\n");
-                        }else{
-                            if(!espera){
-                                posicionRegistro1 = buscarRegistro("DX");
-                                String impresion = pp.getTextFieldEntrada().getText();
-                                valor = Integer.parseInt(impresion);
-                                registros[posicionRegistro1].setValor(valor);
-                                espera = false;
-                                bcpActual.setEstado("Ejecutando");
-                            }else{
-                                if(!(bcpActual.getEstado().equals("Esperando"))){
-                                    bcpActual.setEstado("Esperando");
-                                }
-                            }
-                        }
-                        break;
-                    case "JMP":
-                        valor = instruccionActual.getValor();
-                        posicionActualizada = posicion + valor;
-                        registros[buscarRegistro("PC")].setValor(posicionActualizada);
-                        break;
-                    case "CMP":
-                        registroOrigen = instruccionActual.getRegistroOrigen();
-                        posicionRegistro1 = buscarRegistro(registroOrigen);
-                        valor = registros[posicionRegistro1].getValor();
-                        registroDestino = instruccionActual.getRegistroDestino();
-                        posicionRegistro2 = buscarRegistro(registroDestino);
-                        valor2 = registros[posicionRegistro2].getValor();
-                        cmpResult = valor == valor2;
-                        break;
-                    case "JE":
-                        if(cmpResult){
-                            valor = instruccionActual.getValor();
-                            posicionActualizada = posicion + valor;
-                            registros[buscarRegistro("PC")].setValor(posicionActualizada);
-                        }
-                        break;
-                    case "JNE":
-                        if(!cmpResult){
-                            valor = instruccionActual.getValor();
-                            posicionActualizada = posicion + valor;
-                            registros[buscarRegistro("PC")].setValor(posicionActualizada);
-                        }
-                        break;
-                    case "PARAM":
-                        param1 = instruccionActual.getValor();
-                        param2 = instruccionActual.getValor2();
-                        param3 = instruccionActual.getValor3();
-                        if(instruccionActual.getCantidadParam() == 3){
-                            if(pila.size()<=5 && pila.size()-3 > 0){
-                                pila.push(param1);
-                                pila.push(param2);
-                                pila.push(param3);
-                            }else{
-                                error();
-                            }
-                        }else if(instruccionActual.getCantidadParam() == 2){
-                            if(pila.size()<=5 && pila.size()-2 > 0){
-                                pila.push(param1);
-                                pila.push(param2);
-                            }else{
-                                error();
-                            }
-                        }else{
-                            if(pila.size()<=5 && pila.size()-1 > 0){
-                                pila.push(param1);
-                            }else{
-                                error();
-                            }
-                        }
-                        break;
-                    case "PUSH":
-                        if(pila.size() < 5){
-                            registroOrigen = instruccionActual.getLlamada();
-                            posicionRegistro1 = buscarRegistro(registroOrigen);
-                            valorActual = registros[posicionRegistro1].getValor();
-                            pila.push(valorActual);
-                        }else{
-                            error();
-                        }
-                        break;
-                    case "POP":
-                        if(!pila.isEmpty()){
-                            registroDestino = instruccionActual.getLlamada();
-                            posicionRegistro1 = buscarRegistro(registroDestino);
-                            valorActual = pila.pop();
-                            registros[posicionRegistro1].setValor(valorActual);
-                        }else{
-                            error();
-                        }
-                        break;
-                    default:
-                        System.out.println("A");
-                        JOptionPane.showMessageDialog (null, "Error semantico", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-
-                if(bcpActual.getEstado().equals("Preparado")){
-                    bcpActual.setEstado("Ejecutando");
-                }
-                if(posicion==bcpActual.getFinalMemoria()){
-                    bcpActual.setEstado("Terminado");
-                    error();
+            if(bcpActual!=null){
+                if(pp.getBtnInstruccion().getText().equals("Siguiente Proceso")){
+                    cambioContexto();
+                    pp.getBtnInstruccion().setText("Siguiente Instruccion");
                 }else{
-                    if(!(bcpActual.getEstado().equals("Esperando"))){
-                        posicion++;
-                        registros[buscarRegistro("PC")].setValor(posicion);
-                        Instruccion siguienteInstruccion = (Instruccion) memoriaPrincipal.getContenido()[posicion];
-                        ir = siguienteInstruccion.getLinea();
+                    if(pp.getBtnInstruccion().getText().equals("Iniciar Proceso")){
+                        pp.getBtnInstruccion().setText("Siguiente Instruccion");
+                    }
+                    if(pp.getBtnInstruccion().getText().equals("Siguiente Instruccion")){
+                        ejecutarInstruccion();
                     }
                 }
-                actualizarBcp();
-                actualizarMemoriaSO();
-                actualizarTabla();
-            }else{
-                inicializarRegistros();
-                actualizarMemoriaSO();
-                actualizarTabla();
             }
-            try {
-                TimeUnit.SECONDS.sleep(1);
-                tiempoEjecucion += 1;
-            } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+        }
+    };
+
+    ActionListener btnAutomatico_ActionPerformed = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ejecutarInstruccion();
         }
     };
 
@@ -334,6 +123,14 @@ public class Controlador{
         }
     };
 
+    ActionListener btnCambiarArchivo_ActionPerformed = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pp.setVisible(false);
+            pm.setVisible(true);
+        }
+    };
+
     ActionListener btnMemoria_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -346,6 +143,7 @@ public class Controlador{
         @Override
         public void actionPerformed(ActionEvent e) {
             espera = true;
+            ejecutarInstruccion();
         }
     };
 
@@ -395,33 +193,31 @@ public class Controlador{
                     Random random = new Random();
                     int min = memoriaPrincipal.getLimite();
                     int max = 1024;
-                    int posicionAleatoria = random.nextInt(max - min + 1) + min;
-                    while(!disponibilidad(posicionAleatoria, instrucciones.size())){
-                        random = new Random();
-                        max = 1024;
+                    int posicionAleatoria = 1020;//random.nextInt(max - min + 1) + min;
+                    while(!disponibilidad(posicionAleatoria, memoriaPrincipal.getContenido().length, instrucciones.size())){
                         posicionAleatoria = random.nextInt(max - min + 1) + min;
                     }
                     for(int i = 0; i<instrucciones.size(); i++){
                         memoriaPrincipal.getContenido()[posicionAleatoria]=instrucciones.get(i);
                         posicionAleatoria++;
                     }
-                    BloqueProceso bcpNuevo = new BloqueProceso("nuevo","-", 0, 0);
+                    ir = instrucciones.get(0).getLinea();
+                    BloqueProceso bcpNuevo = new BloqueProceso("nuevo",ir, 0, 0);
                     bcpNuevo.setRegistros(inicializarBcpHash());
                     posicionAleatoria-=instrucciones.size();
                     bcpNuevo.setInicioMemoria(posicionAleatoria);
                     bcpNuevo.setFinalMemoria(posicionAleatoria+instrucciones.size());
-                    ir = instrucciones.get(0).getLinea();
-                    registros[buscarRegistro("PC")].setValor(posicionAleatoria);
                     bcpNuevo.getRegistros().replace("PC", posicionAleatoria);
                     bcpNuevo.setEstado("Preparado");
                     if(bcpActual == null){
+                        registros[buscarRegistro("PC")].setValor(posicionAleatoria);
                         bcpActual = bcpNuevo;
                         actualizarTabla();
                     }
-                    actualizarMemoriaSO();
+                    actualizarMemoriaSO(bcpNuevo);
                     listaBcp.add(bcpNuevo);
                 }else{
-                    JOptionPane.showMessageDialog (null, "Error semantico", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog (null, "Error en la carga del proceso nuevo. Asegurese de que el proceso no contenga errores y de no cargar un proceso vacío", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }else{
                 error();
@@ -461,7 +257,7 @@ public class Controlador{
         this.identificadores = new String[]{"AX", "BX", "CX", "DX", "AC", "PC"};
         this.registros = new Registro[6];
         inicializarRegistros();
-        String columnas[] = new String[] {"ID", "Estado","AX", "BX", "CX", "DX", "AC", "PC", "IR", "Inicio", "Final"};
+        String columnas[] = new String[] {"ID", "Estado", "Pila", "AX", "BX", "CX", "DX", "AC", "PC", "IR", "Inicio", "Final"};
         dtm.setColumnIdentifiers(columnas);
         pp.getjTable1().setModel(dtm);
         pp.getJScrollPane2().setViewportView(pp.getjTable1());
@@ -476,7 +272,6 @@ public class Controlador{
     public ArrayList<Instruccion> construirListaInstrucciones(String[] listaTemporal){
         ArrayList<Instruccion> instrucciones = new ArrayList<>();
         for(int i = 0; i < listaTemporal.length; i++){
-            System.out.println("Entro al for");
             String actual = listaTemporal[i];
             String[] division = actual.split("\\s+");
             String operacion = division[0];
@@ -596,41 +391,47 @@ public class Controlador{
     }
 
     public String[] construirLista(){
-        String contenido = this.archivoActual.getContenido();
-        String contenido2 = contenido.replaceAll(",", " ");
-        String correccion = contenido2.trim();
-        String correccion2 = correccion.toUpperCase();
-        String[] resultado = correccion2.split("\\n+");
+        String[] resultado = {};
+        if(archivoActual!=null){
+            String contenido = this.archivoActual.getContenido();
+            String contenido2 = contenido.replaceAll(",", " ");
+            String correccion = contenido2.trim();
+            String correccion2 = correccion.toUpperCase();
+            resultado = correccion2.split("\\n+");
+            return resultado; 
+        }
         return resultado;
     }
     
-    public boolean disponibilidad(int posicion, int cantidad){
-        int cont = 0;
-        boolean disposicion = true;
+    public boolean disponibilidad(int posicion, int limite, int cantidad){
+        int cont = 1;
         boolean resultado = false;
-        for(int i = posicion; i<memoriaPrincipal.getContenido().length; i++){
-            if(memoriaPrincipal.getContenido()[i] == null){
-                disposicion = false;
+        for(int i = posicion; i<limite; i++){
+            if(memoriaPrincipal.getContenido()[i] != null){
+                break;
+            }else if(cont==cantidad){
+                resultado = true;
                 break;
             }
             cont++;
-        }
-        if(disposicion && cont == cantidad){
-            resultado = true;
         }
         return resultado;
     }
 
     // Método que recibe una lista de instrucciones y valida si todas son correctas
     public boolean validarInstruccion(String[] instrucciones) {
-        for (String instruccion : instrucciones) {
-            System.out.println(instruccion + "\n");
-            Matcher matcher = this.patron.matcher(instruccion);
-            if (!matcher.matches()) {
-                return false; // Si alguna no coincide, retorna false
+        if(instrucciones.length != 0){
+            for (String instruccion : instrucciones) {
+                System.out.println(instruccion + "\n");
+                Matcher matcher = this.patron.matcher(instruccion);
+                if (!matcher.matches()) {
+                    return false;
+                }
             }
-        }
-        return true; // Si todas coinciden, retorna true
+            return true;
+        }else{
+            return false;
+        }  
     }
 
     public void actualizarTablaMemoria(){
@@ -642,11 +443,15 @@ public class Controlador{
         for(int i = 0; i<memoriaPrincipal.getContenido().length; i++){
             Vector<Object> vector = new Vector<>();
             vector.add(i);
-            Class<?> objClass = memoriaPrincipal.getContenido()[i].getClass();
-            String clase = objClass.getSimpleName();
-            if(clase.equals("Instruccion")){
-                Instruccion instruccion = (Instruccion)memoriaPrincipal.getContenido()[i];
-                vector.add(instruccion.getLinea());
+            if(memoriaPrincipal.getContenido()[i]!=null){
+                Class<?> objClass = memoriaPrincipal.getContenido()[i].getClass();
+                String clase = objClass.getSimpleName();
+                if(clase.equals("Instruccion")){
+                    Instruccion instruccion = (Instruccion)memoriaPrincipal.getContenido()[i];
+                    vector.add(instruccion.getLinea());
+                }else{
+                    vector.add(memoriaPrincipal.getContenido()[i]);
+                }
             }else{
                 vector.add(memoriaPrincipal.getContenido()[i]);
             }
@@ -655,7 +460,7 @@ public class Controlador{
     }
 
     public void error(){
-
+        pp.getBtnInstruccion().setText("Siguiente Proceso");
     }
 
     public void inicializarRegistros(){
@@ -685,25 +490,27 @@ public class Controlador{
         return registros;
     }
 
-    public void actualizarMemoriaSO(){
-        Arrays.fill(memoriaPrincipal.getContenido(), 0, memoriaPrincipal.getLimite(), null);
+    public void actualizarMemoriaSO(BloqueProceso procesoNuevo){
         Random random = new Random();
         int max = memoriaPrincipal.getLimite();
         int min = 0;
         int posicionAleatoria = random.nextInt(max - min + 1) + min;
-        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getId();
+        while (!disponibilidad(posicionAleatoria, max, 11)) {
+            posicionAleatoria = random.nextInt(max - min + 1) + min;
+        }
+        memoriaPrincipal.getContenido()[posicionAleatoria] = procesoNuevo.getId();
         posicionAleatoria++;
-        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getEstado();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = procesoNuevo.getEstado();
         posicionAleatoria++;
-        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getInicioMemoria();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = procesoNuevo.getInicioMemoria();
         posicionAleatoria++;
-        memoriaPrincipal.getContenido()[posicionAleatoria] = bcpActual.getFinalMemoria();
+        memoriaPrincipal.getContenido()[posicionAleatoria] = procesoNuevo.getFinalMemoria();
         posicionAleatoria++;
-        for (Map.Entry<String, Integer> entry : bcpActual.getRegistros().entrySet()) {
+        for (Map.Entry<String, Integer> entry : procesoNuevo.getRegistros().entrySet()) {
             memoriaPrincipal.getContenido()[posicionAleatoria] = entry.getKey() + " = " + entry.getValue().toString();
             posicionAleatoria++;
         }
-        memoriaPrincipal.getContenido()[posicionAleatoria] = ir;
+        memoriaPrincipal.getContenido()[posicionAleatoria] = procesoNuevo.getIr();
         actualizarTablaMemoria();
     }
 
@@ -724,7 +531,7 @@ public class Controlador{
     }
 
     public void actualizarTabla(){
-        dtm.addRow(new Object[] { bcpActual.getId(), bcpActual.getEstado(), bcpActual.getRegistros().get("AX"), bcpActual.getRegistros().get("BX"), bcpActual.getRegistros().get("CX"), bcpActual.getRegistros().get("DX"), bcpActual.getRegistros().get("AC"), bcpActual.getRegistros().get("PC"), this.ir, bcpActual.getInicioMemoria(),bcpActual.getFinalMemoria()});
+        dtm.addRow(new Object[] { bcpActual.getId(), bcpActual.getEstado(), pila.toString(), bcpActual.getRegistros().get("AX"), bcpActual.getRegistros().get("BX"), bcpActual.getRegistros().get("CX"), bcpActual.getRegistros().get("DX"), bcpActual.getRegistros().get("AC"), bcpActual.getRegistros().get("PC"), this.ir, bcpActual.getInicioMemoria(),bcpActual.getFinalMemoria()});
     }
 
     public boolean validarRegistro(String registro) {
@@ -759,5 +566,243 @@ public class Controlador{
             }
         }
         return true;  // Todas las posiciones son nulas, el arreglo está "vacío".
+    }
+
+    public void ejecutarInstruccion(){
+        int posicion = registros[buscarRegistro("PC")].getValor();
+        Instruccion instruccionActual = (Instruccion) memoriaPrincipal.getContenido()[posicion];
+        String operacion = instruccionActual.getOperacion();
+        int valor;
+        int valor2;
+        int valorActual;
+        int posicionActualizada;
+        int posicionRegistro1;
+        int posicionRegistro2;
+        String registroOrigen;
+        String registroDestino;
+        String llamada;
+        int param1;
+        int param2;
+        int param3;
+        System.out.println(pila);
+
+        switch(operacion) {
+            case "MOV":
+                if(instruccionActual.getRegistroOrigen() == null){
+                    valor = instruccionActual.getValor();
+                    registroDestino = instruccionActual.getRegistroDestino();
+                    posicionRegistro1 = buscarRegistro(registroDestino);
+                    registros[posicionRegistro1].setValor(valor);
+                }else{
+                    registroOrigen = instruccionActual.getRegistroOrigen();
+                    posicionRegistro1 = buscarRegistro(registroOrigen);
+                    valor = registros[posicionRegistro1].getValor();
+                    registroDestino = instruccionActual.getRegistroDestino();
+                    posicionRegistro2 = buscarRegistro(registroDestino);
+                    registros[posicionRegistro2].setValor(valor);
+                }
+                break;
+            case "ADD":
+                registroOrigen = instruccionActual.getRegistroOrigen();
+                posicionRegistro1 = buscarRegistro(registroOrigen);
+                valor = registros[posicionRegistro1].getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                valorActual = registros[posicionRegistro2].getValor();
+                registros[posicionRegistro2].setValor(valorActual+valor);
+                break;
+            case "SUB":
+                registroOrigen = instruccionActual.getRegistroOrigen();
+                posicionRegistro1 = buscarRegistro(registroOrigen);
+                valor = registros[posicionRegistro1].getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                valorActual = registros[posicionRegistro2].getValor();
+                registros[posicionRegistro2].setValor(valorActual-valor);
+                break;
+            case "STORE":
+                registroOrigen = instruccionActual.getRegistroDestino();
+                posicionRegistro1 = buscarRegistro(registroOrigen);
+                valor = registros[posicionRegistro1].getValor();
+                registroDestino = instruccionActual.getRegistroOrigen();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                registros[posicionRegistro2].setValor(valor);
+                break;
+            case "LOAD":
+                registroOrigen = instruccionActual.getRegistroOrigen();
+                posicionRegistro1 = buscarRegistro(registroOrigen);
+                valor = registros[posicionRegistro1].getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                registros[posicionRegistro2].setValor(valor);
+                break;
+            case "INC":
+                valor = instruccionActual.getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                valorActual = registros[posicionRegistro2].getValor();
+                registros[posicionRegistro2].setValor(valorActual+valor);
+                break;
+            case "DEC":
+                valor = instruccionActual.getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                valorActual = registros[posicionRegistro2].getValor();
+                registros[posicionRegistro2].setValor(valorActual-valor);
+                break;
+            case "SWAP":
+                registroOrigen = instruccionActual.getRegistroOrigen();
+                posicionRegistro1 = buscarRegistro(registroOrigen);
+                valor = registros[posicionRegistro1].getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                valor2 = registros[posicionRegistro2].getValor();
+                registros[posicionRegistro2].setValor(valor);
+                registros[posicionRegistro1].setValor(valor2);
+                break;
+            case "INT":
+                llamada = instruccionActual.getLlamada();
+                if(llamada.equals("20H")){
+                    bcpActual.setEstado("Terminado");
+                }else if(llamada.equals("10H")){
+                    posicionRegistro1 = buscarRegistro("DX");
+                    valor = registros[posicionRegistro1].getValor();
+                    String impresion = String.valueOf(valor);
+                    pp.getTextAreaPantalla().setText(impresion+"\n");
+                }else{
+                    if(espera){
+                        posicionRegistro1 = buscarRegistro("DX");
+                        String impresion = pp.getTextFieldEntrada().getText();
+                        valor = Integer.parseInt(impresion);
+                        registros[posicionRegistro1].setValor(valor);
+                        espera = false;
+                        bcpActual.setEstado("Ejecutando");
+                    }else{
+                        if(!(bcpActual.getEstado().equals("Esperando"))){
+                            bcpActual.setEstado("Esperando");
+                        }
+                    }
+                }
+                break;
+            case "JMP":
+                valor = instruccionActual.getValor();
+                posicionActualizada = posicion + valor;
+                registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                break;
+            case "CMP":
+                registroOrigen = instruccionActual.getRegistroOrigen();
+                posicionRegistro1 = buscarRegistro(registroOrigen);
+                valor = registros[posicionRegistro1].getValor();
+                registroDestino = instruccionActual.getRegistroDestino();
+                posicionRegistro2 = buscarRegistro(registroDestino);
+                valor2 = registros[posicionRegistro2].getValor();
+                cmpResult = valor == valor2;
+                break;
+            case "JE":
+                if(cmpResult){
+                    valor = instruccionActual.getValor();
+                    posicionActualizada = posicion + valor;
+                    registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                }
+                break;
+            case "JNE":
+                if(!cmpResult){
+                    valor = instruccionActual.getValor();
+                    posicionActualizada = posicion + valor;
+                    registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                }
+                break;
+            case "PARAM":
+                param1 = instruccionActual.getValor();
+                param2 = instruccionActual.getValor2();
+                param3 = instruccionActual.getValor3();
+                if(instruccionActual.getCantidadParam() == 3){
+                    if(pila.size()<=5 && pila.size()-3 > 0){
+                        pila.push(param1);
+                        pila.push(param2);
+                        pila.push(param3);
+                    }else{
+                        error();
+                    }
+                }else if(instruccionActual.getCantidadParam() == 2){
+                    if(pila.size()<=5 && pila.size()-2 > 0){
+                        pila.push(param1);
+                        pila.push(param2);
+                    }else{
+                        error();
+                    }
+                }else{
+                    if(pila.size()<=5 && pila.size()-1 > 0){
+                        pila.push(param1);
+                    }else{
+                        error();
+                    }
+                }
+                break;
+            case "PUSH":
+                if(pila.size() < 5){
+                    registroOrigen = instruccionActual.getLlamada();
+                    posicionRegistro1 = buscarRegistro(registroOrigen);
+                    valorActual = registros[posicionRegistro1].getValor();
+                    pila.push(valorActual);
+                }else{
+                    error();
+                }
+                break;
+            case "POP":
+                if(!pila.isEmpty()){
+                    registroDestino = instruccionActual.getLlamada();
+                    posicionRegistro1 = buscarRegistro(registroDestino);
+                    valorActual = pila.pop();
+                    registros[posicionRegistro1].setValor(valorActual);
+                }else{
+                    error();
+                }
+                break;
+            default:
+                System.out.println("A");
+                JOptionPane.showMessageDialog (null, "Error en la carga del proceso nuevo. Asegurese de que el proceso no contenga errores y no cargar un proceso vacío", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        if(bcpActual.getEstado().equals("Preparado")){
+            bcpActual.setEstado("Ejecutando");
+        }else if(bcpActual.getEstado().equals("Terminado")){
+            pp.getBtnInstruccion().setText("Siguiente Proceso");
+        }else if(bcpActual.getEstado().equals("Ejecutando")){
+            posicion++;
+            if(!(posicion == bcpActual.getFinalMemoria())){
+                registros[buscarRegistro("PC")].setValor(posicion);
+                Instruccion siguienteInstruccion = (Instruccion) memoriaPrincipal.getContenido()[posicion];
+                ir = siguienteInstruccion.getLinea();
+            }else{
+                error();
+            }
+        }
+        actualizarBcp();
+        actualizarTablaMemoria();
+        actualizarTabla();
+        try {
+            TimeUnit.SECONDS.sleep(1);
+            tiempoEjecucion += 1;
+        } catch (InterruptedException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    }
+
+    public void cambioContexto(){
+        if(listaBcp.size()>1){
+            listaBcp.remove(0);
+            bcpActual = listaBcp.get(0);
+            this.ir =  bcpActual.getIr();
+            for(int i = 0; i<identificadores.length; i++){
+                int valor = bcpActual.getRegistros().get(identificadores[i]);
+                int posicion = buscarRegistro(identificadores[i]);
+                registros[posicion].setValor(valor);
+            }
+            actualizarTabla();
+        }else{
+            bcpActual = null;
+        }
     }
 }
