@@ -116,14 +116,22 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
 
+        btnInstruccion.setBackground(new java.awt.Color(0, 51, 204));
+        btnInstruccion.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnInstruccion.setForeground(new java.awt.Color(255, 255, 255));
         btnInstruccion.setText("Iniciar Proceso");
+        btnInstruccion.setBorder(null);
         btnInstruccion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInstruccionActionPerformed(evt);
             }
         });
 
+        btnSeleccionar.setBackground(new java.awt.Color(0, 51, 204));
+        btnSeleccionar.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnSeleccionar.setForeground(new java.awt.Color(255, 255, 255));
         btnSeleccionar.setText("Seleccione el archivo");
+        btnSeleccionar.setBorder(null);
         btnSeleccionar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSeleccionarActionPerformed(evt);
@@ -149,18 +157,38 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(jTable1);
 
+        btnAutomatico.setBackground(new java.awt.Color(0, 51, 204));
+        btnAutomatico.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnAutomatico.setForeground(new java.awt.Color(255, 255, 255));
         btnAutomatico.setText("Automático");
+        btnAutomatico.setBorder(null);
 
+        btnCargar.setBackground(new java.awt.Color(0, 51, 204));
+        btnCargar.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnCargar.setForeground(new java.awt.Color(255, 255, 255));
         btnCargar.setText("Cargar");
+        btnCargar.setBorder(null);
 
-        lblBcp.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblBcp.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         lblBcp.setText("Bloque de Control de Procesos");
 
+        btnMemoria.setBackground(new java.awt.Color(0, 51, 204));
+        btnMemoria.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnMemoria.setForeground(new java.awt.Color(255, 255, 255));
         btnMemoria.setText("Ver memoria");
+        btnMemoria.setBorder(null);
 
+        btnConfiguracion.setBackground(new java.awt.Color(0, 51, 204));
+        btnConfiguracion.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnConfiguracion.setForeground(new java.awt.Color(255, 255, 255));
         btnConfiguracion.setText("Configuración");
+        btnConfiguracion.setBorder(null);
 
+        btnEstadisticas.setBackground(new java.awt.Color(0, 51, 204));
+        btnEstadisticas.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnEstadisticas.setForeground(new java.awt.Color(255, 255, 255));
         btnEstadisticas.setText("Estadísticas");
+        btnEstadisticas.setBorder(null);
 
         textAreaPantalla.setEditable(false);
         textAreaPantalla.setBackground(new java.awt.Color(51, 51, 51));
@@ -170,7 +198,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         textAreaPantalla.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jScrollPane3.setViewportView(textAreaPantalla);
 
+        btnSgteArchivo.setBackground(new java.awt.Color(0, 51, 204));
+        btnSgteArchivo.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnSgteArchivo.setForeground(new java.awt.Color(255, 255, 255));
         btnSgteArchivo.setText("Siguiente archivo");
+        btnSgteArchivo.setBorder(null);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -178,34 +210,34 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnSeleccionar, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnSgteArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(btnMemoria, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnConfiguracion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(btnSgteArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnSeleccionar, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnCargar)))
+                        .addComponent(btnConfiguracion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(193, 193, 193)
+                        .addGap(173, 173, 173)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(textFieldEntrada, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(65, 65, 65)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 920, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblBcp, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnInstruccion)
+                                .addComponent(lblBcp, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnInstruccion, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnAutomatico, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnEstadisticas)))))
+                                .addComponent(btnEstadisticas, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(86, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -235,7 +267,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(textFieldEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(88, Short.MAX_VALUE))
+                .addContainerGap(91, Short.MAX_VALUE))
         );
 
         pack();

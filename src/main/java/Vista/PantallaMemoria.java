@@ -11,20 +11,6 @@ package Vista;
 public class PantallaMemoria extends javax.swing.JFrame {
 
     /**
-     * @return the btnMemoriaSecundaria
-     */
-    public javax.swing.JButton getBtnMemoriaSecundaria() {
-        return btnMemoriaSecundaria;
-    }
-
-    /**
-     * @param btnMemoriaSecundaria the btnMemoriaSecundaria to set
-     */
-    public void setBtnMemoriaSecundaria(javax.swing.JButton btnMemoriaSecundaria) {
-        this.btnMemoriaSecundaria = btnMemoriaSecundaria;
-    }
-
-    /**
      * @return the btnCerrar
      */
     public javax.swing.JButton getBtnCerrar() {
@@ -85,7 +71,6 @@ public class PantallaMemoria extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         btnCerrar = new javax.swing.JButton();
-        btnMemoriaSecundaria = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -102,9 +87,11 @@ public class PantallaMemoria extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        btnCerrar.setBackground(new java.awt.Color(0, 51, 204));
+        btnCerrar.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        btnCerrar.setForeground(new java.awt.Color(255, 255, 255));
         btnCerrar.setText("Cerrar");
-
-        btnMemoriaSecundaria.setText("Memoria Secundaria");
+        btnCerrar.setBorder(null);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -116,10 +103,8 @@ public class PantallaMemoria extends javax.swing.JFrame {
                         .addGap(16, 16, 16)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(123, 123, 123)
-                        .addComponent(btnCerrar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnMemoriaSecundaria)))
+                        .addGap(180, 180, 180)
+                        .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -127,11 +112,9 @@ public class PantallaMemoria extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 449, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCerrar)
-                    .addComponent(btnMemoriaSecundaria))
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(47, Short.MAX_VALUE))
         );
 
         pack();
@@ -174,7 +157,6 @@ public class PantallaMemoria extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCerrar;
-    private javax.swing.JButton btnMemoriaSecundaria;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
