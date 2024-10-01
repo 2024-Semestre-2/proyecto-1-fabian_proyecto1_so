@@ -39,20 +39,6 @@ public class PantallaConfiguracion extends javax.swing.JFrame {
     }
 
     /**
-     * @return the jTextField1
-     */
-    public javax.swing.JTextField getjTextField1() {
-        return jTextField1;
-    }
-
-    /**
-     * @param jTextField1 the jTextField1 to set
-     */
-    public void setjTextField1(javax.swing.JTextField jTextField1) {
-        this.jTextField1 = jTextField1;
-    }
-
-    /**
      * Creates new form PantallaConfiguracion
      */
     public PantallaConfiguracion() {
@@ -68,12 +54,14 @@ public class PantallaConfiguracion extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTextField1 = new javax.swing.JTextField();
+        tamanho = new javax.swing.JTextField();
         btnVolver = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
+        secundaria = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        limite = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -81,44 +69,49 @@ public class PantallaConfiguracion extends javax.swing.JFrame {
 
         btnGuardar.setText("Guardar");
 
-        jLabel1.setText("Memoria Principal");
+        jLabel1.setText("Tamaño:");
 
-        jLabel2.setText("Memoria Secundaria");
+        jLabel2.setText("Memoria Secundaria: ");
+
+        jLabel3.setText("Límite Sistema operativo:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2))
-                        .addGap(36, 36, 36))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnVolver)
-                        .addGap(24, 24, 24)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(btnGuardar)))
-                .addContainerGap(33, Short.MAX_VALUE))
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(tamanho, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                    .addComponent(secundaria, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                    .addComponent(limite))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(149, Short.MAX_VALUE)
+                .addComponent(btnVolver)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnGuardar)
+                .addGap(142, 142, 142))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(63, 63, 63)
+                .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addGap(33, 33, 33)
+                    .addComponent(jLabel1)
+                    .addComponent(tamanho, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(limite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(23, 23, 23)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(secundaria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -170,7 +163,51 @@ public class PantallaConfiguracion extends javax.swing.JFrame {
     private javax.swing.JButton btnVolver;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JTextField limite;
+    private javax.swing.JTextField secundaria;
+    private javax.swing.JTextField tamanho;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * @return the limite
+     */
+    public javax.swing.JTextField getLimite() {
+        return limite;
+    }
+
+    /**
+     * @param limite the limite to set
+     */
+    public void setLimite(javax.swing.JTextField limite) {
+        this.limite = limite;
+    }
+
+    /**
+     * @return the secundaria
+     */
+    public javax.swing.JTextField getSecundaria() {
+        return secundaria;
+    }
+
+    /**
+     * @param secundaria the secundaria to set
+     */
+    public void setSecundaria(javax.swing.JTextField secundaria) {
+        this.secundaria = secundaria;
+    }
+
+    /**
+     * @return the tamanho
+     */
+    public javax.swing.JTextField getTamanho() {
+        return tamanho;
+    }
+
+    /**
+     * @param tamanho the tamanho to set
+     */
+    public void setTamanho(javax.swing.JTextField tamanho) {
+        this.tamanho = tamanho;
+    }
 }

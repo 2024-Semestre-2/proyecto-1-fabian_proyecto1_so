@@ -26,6 +26,7 @@ public class BloqueProceso {
         this.inicioMemoria = inicioMemoria;
         this.finalMemoria = finalMemoria;
         this.ir = ir;
+        id = ++counter;
     }
 
     /**

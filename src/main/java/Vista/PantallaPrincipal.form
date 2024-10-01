@@ -33,7 +33,7 @@
                       <Component id="btnMemoria" alignment="0" max="32767" attributes="0"/>
                       <Component id="btnConfiguracion" alignment="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jButton1" min="-2" pref="239" max="-2" attributes="0"/>
+                  <Component id="btnSgteArchivo" min="-2" pref="239" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="239" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="btnSeleccionar" min="-2" pref="155" max="-2" attributes="0"/>
@@ -86,7 +86,7 @@
                   <Group type="102" attributes="0">
                       <Component id="jScrollPane1" min="-2" pref="272" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnSgteArchivo" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
                       <Component id="btnMemoria" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -224,7 +224,7 @@
     </Container>
     <Component class="javax.swing.JTextField" name="textFieldEntrada">
     </Component>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="btnSgteArchivo">
       <Properties>
         <Property name="text" type="java.lang.String" value="Siguiente archivo"/>
       </Properties>

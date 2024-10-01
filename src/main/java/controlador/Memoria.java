@@ -11,11 +11,13 @@ package controlador;
 public class Memoria {
     
     private int limite;
+    private int secundaria;
     private Object[] contenido;
 
-    public Memoria(){
-        this.contenido = new Object[1024];
-        this.limite = 512;
+    public Memoria(Object[] contenido, int limite, int secundaria){
+        this.contenido = contenido;
+        this.limite = limite;
+        this.secundaria = secundaria;
     }
     
     /**
@@ -30,6 +32,20 @@ public class Memoria {
      */
     public void setLimite(int limite) {
         this.limite = limite;
+    }
+
+    /**
+     * @return the limite
+     */
+    public int getSecundaria() {
+        return secundaria;
+    }
+
+    /**
+     * @param limite the limite to set
+     */
+    public void setSecundaria(int secundaria) {
+        this.secundaria = secundaria;
     }
 
     /**

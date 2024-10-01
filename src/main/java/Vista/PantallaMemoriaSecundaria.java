@@ -8,34 +8,20 @@ package Vista;
  *
  * @author Fabian
  */
-public class PantallaMemoria extends javax.swing.JFrame {
+public class PantallaMemoriaSecundaria extends javax.swing.JFrame {
 
     /**
-     * @return the btnMemoriaSecundaria
+     * @return the btnVolver
      */
-    public javax.swing.JButton getBtnMemoriaSecundaria() {
-        return btnMemoriaSecundaria;
+    public javax.swing.JButton getBtnVolver() {
+        return btnVolver;
     }
 
     /**
-     * @param btnMemoriaSecundaria the btnMemoriaSecundaria to set
+     * @param btnVolver the btnVolver to set
      */
-    public void setBtnMemoriaSecundaria(javax.swing.JButton btnMemoriaSecundaria) {
-        this.btnMemoriaSecundaria = btnMemoriaSecundaria;
-    }
-
-    /**
-     * @return the btnCerrar
-     */
-    public javax.swing.JButton getBtnCerrar() {
-        return btnCerrar;
-    }
-
-    /**
-     * @param btnCerrar the btnCerrar to set
-     */
-    public void setBtnCerrar(javax.swing.JButton btnCerrar) {
-        this.btnCerrar = btnCerrar;
+    public void setBtnVolver(javax.swing.JButton btnVolver) {
+        this.btnVolver = btnVolver;
     }
 
     /**
@@ -53,23 +39,23 @@ public class PantallaMemoria extends javax.swing.JFrame {
     }
 
     /**
-     * @return the jTable1
+     * @return the tablaMemoria
      */
-    public javax.swing.JTable getjTable1() {
-        return jTable1;
+    public javax.swing.JTable getTablaMemoria() {
+        return tablaMemoria;
     }
 
     /**
-     * @param jTable1 the jTable1 to set
+     * @param tablaMemoria the tablaMemoria to set
      */
-    public void setjTable1(javax.swing.JTable jTable1) {
-        this.jTable1 = jTable1;
+    public void setTablaMemoria(javax.swing.JTable tablaMemoria) {
+        this.tablaMemoria = tablaMemoria;
     }
 
     /**
-     * Creates new form PantallaMemoria
+     * Creates new form PantallaMemoriaSecundaria
      */
-    public PantallaMemoria() {
+    public PantallaMemoriaSecundaria() {
         initComponents();
     }
 
@@ -83,13 +69,12 @@ public class PantallaMemoria extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        btnCerrar = new javax.swing.JButton();
-        btnMemoriaSecundaria = new javax.swing.JButton();
+        tablaMemoria = new javax.swing.JTable();
+        btnVolver = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMemoria.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -100,38 +85,31 @@ public class PantallaMemoria extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaMemoria);
 
-        btnCerrar.setText("Cerrar");
-
-        btnMemoriaSecundaria.setText("Memoria Secundaria");
+        btnVolver.setText("Volver");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(48, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(123, 123, 123)
-                        .addComponent(btnCerrar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnMemoriaSecundaria)))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addGap(172, 172, 172)
+                .addComponent(btnVolver)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(32, 32, 32)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 449, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCerrar)
-                    .addComponent(btnMemoriaSecundaria))
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addGap(31, 31, 31)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addComponent(btnVolver)
+                .addGap(38, 38, 38))
         );
 
         pack();
@@ -154,28 +132,27 @@ public class PantallaMemoria extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PantallaMemoria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PantallaMemoriaSecundaria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PantallaMemoria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PantallaMemoriaSecundaria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PantallaMemoria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PantallaMemoriaSecundaria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PantallaMemoria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PantallaMemoriaSecundaria.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PantallaMemoria().setVisible(true);
+                new PantallaMemoriaSecundaria().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCerrar;
-    private javax.swing.JButton btnMemoriaSecundaria;
+    private javax.swing.JButton btnVolver;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tablaMemoria;
     // End of variables declaration//GEN-END:variables
 }

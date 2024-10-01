@@ -11,6 +11,20 @@ package Vista;
 public class PantallaPrincipal extends javax.swing.JFrame {
 
     /**
+     * @return the btnSgteArchivo
+     */
+    public javax.swing.JButton getBtnSgteArchivo() {
+        return btnSgteArchivo;
+    }
+
+    /**
+     * @param btnSgteArchivo the btnSgteArchivo to set
+     */
+    public void setBtnSgteArchivo(javax.swing.JButton btnSgteArchivo) {
+        this.btnSgteArchivo = btnSgteArchivo;
+    }
+
+    /**
      * @return the btnEstadisticas
      */
     public javax.swing.JButton getBtnEstadisticas() {
@@ -97,7 +111,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         textAreaPantalla = new javax.swing.JTextArea();
         textFieldEntrada = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btnSgteArchivo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -156,7 +170,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         textAreaPantalla.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jScrollPane3.setViewportView(textAreaPantalla);
 
-        jButton1.setText("Siguiente archivo");
+        btnSgteArchivo.setText("Siguiente archivo");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -168,7 +182,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(btnMemoria, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnConfiguracion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSgteArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnSeleccionar, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -210,7 +224,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
+                        .addComponent(btnSgteArchivo)
                         .addGap(44, 44, 44)
                         .addComponent(btnMemoria)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -278,7 +292,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnInstruccion;
     private javax.swing.JButton btnMemoria;
     private javax.swing.JButton btnSeleccionar;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnSgteArchivo;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;

@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controlador;
+import Vista.Estadisticas;
 import Vista.PantallaConfiguracion;
 import Vista.PantallaMemoria;
 import Vista.PantallaPrincipal;
@@ -21,6 +22,14 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntUnaryOperator;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 /**
  *
@@ -31,9 +40,9 @@ public class Controlador{
     private PantallaPrincipal pp;
     private PantallaConfiguracion pconfig;
     private PantallaMemoria pm;
+    private Estadisticas pe;
     private Archivo archivoActual;
     private Memoria memoriaPrincipal;
-    private Memoria memoriaSecundaria;
     private ArrayList<BloqueProceso> listaBcp;
     private ArrayList<Archivo> listaArchivos;
     private BloqueProceso bcpActual;
@@ -46,6 +55,8 @@ public class Controlador{
     private boolean cmpResult;
     private int tiempoEjecucion;
     private boolean espera;
+    private String horaInicio = "";
+    private String horaFinal = "";
     
 
     DefaultTableModel dtm = new DefaultTableModel(0, 0);
@@ -62,6 +73,9 @@ public class Controlador{
         pconfig.getBtnGuardar().addActionListener(btnGuardar_ActionPerformed);
         pp.getTextFieldEntrada().addActionListener(textFieldEntrada_AntionPerformed);
         pp.getBtnAutomatico().addActionListener(btnAutomatico_ActionPerformed);
+        pp.getBtnSgteArchivo().addActionListener(btnSgtArchivo_ActionPerformed);
+        pp.getBtnEstadisticas().addActionListener(btnEstadisticas_ActionPerformed);
+        pe.getBtnVolver().addActionListener(btnEstadisticasCerrar_ActionPerformed);
     }
 
     ActionListener btnInstruccion_ActionPerformed = new ActionListener() {
@@ -86,7 +100,20 @@ public class Controlador{
     ActionListener btnAutomatico_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            ejecutarInstruccion();
+            new Thread(() -> {
+                if(bcpActual!=null){
+                    while(!bcpActual.getEstado().equals("Terminado")){
+                        ejecutarInstruccion();
+                        try {
+                            Thread.sleep(1000);  // Pausa de 1 segundo
+                        } catch (InterruptedException o) {
+                            // Manejo de excepción en caso de que el hilo sea interrumpido
+                            o.printStackTrace();
+                        }
+                        System.out.println(bcpActual.getEstado());
+                    }
+                }
+            }).start();
         }
     };
 
@@ -123,11 +150,51 @@ public class Controlador{
         }
     };
 
+    ActionListener btnSgtArchivo_ActionPerformed = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(listaArchivos.size()>1){
+                int cont = 0;
+                for(int i = 0; i<listaArchivos.size(); i++){
+                    if(listaArchivos.get(i)==archivoActual){
+                        cont = i;
+                    }
+                }
+                if(cont==listaArchivos.size()-1){
+                    archivoActual =  listaArchivos.get(0);
+                }else{
+                    archivoActual = listaArchivos.get(cont+1);
+                }
+                pp.getjTextArea1().setText(archivoActual.getContenido());
+            }
+        }
+    };
+
     ActionListener btnCambiarArchivo_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             pp.setVisible(false);
             pm.setVisible(true);
+        }
+    };
+
+    ActionListener btnEstadisticas_ActionPerformed = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pp.setVisible(false);
+            String duracion = Integer.toString(tiempoEjecucion);
+            pe.getLblSegundos().setText(duracion);
+            pe.getLblInicio().setText(horaInicio);
+            pe.getLblFinal().setText(horaFinal);
+            pe.setVisible(true);
+        }
+    };
+
+    ActionListener btnEstadisticasCerrar_ActionPerformed = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            pe.setVisible(false);
+            pp.setVisible(true);
         }
     };
 
@@ -150,7 +217,13 @@ public class Controlador{
     ActionListener btnConfiguracion_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            String tamanho = Integer.toString(memoriaPrincipal.getContenido().length);
+            String limite = Integer.toString(memoriaPrincipal.getLimite());
+            String secundaria = Integer.toString(memoriaPrincipal.getSecundaria());
             pp.setVisible(false);
+            pconfig.getTamanho().setText(tamanho);
+            pconfig.getLimite().setText(limite);;
+            pconfig.getSecundaria().setText(secundaria);;
             pconfig.setVisible(true);
         }
     };
@@ -174,10 +247,7 @@ public class Controlador{
     ActionListener btnGuardar_ActionPerformed = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int valor = Integer.parseInt(pconfig.getjTextField1().getText());
-            memoriaPrincipal.setLimite(valor);
-            pp.setVisible(true);
-            pm.setVisible(false);
+            cambiarAjustes();
         }
     };
 
@@ -185,6 +255,9 @@ public class Controlador{
         @Override
         public void actionPerformed(ActionEvent e) {
             if(listaBcp.size() < 5){
+                if(pp.getBtnConfiguracion().isEnabled()){
+                    pp.getBtnConfiguracion().setEnabled(false);
+                }
                 ArrayList<Instruccion> instrucciones;
                 String[] listaTemporal = construirLista();
                 boolean validacion = validarInstruccion(listaTemporal);
@@ -192,9 +265,9 @@ public class Controlador{
                     instrucciones = construirListaInstrucciones(listaTemporal);
                     Random random = new Random();
                     int min = memoriaPrincipal.getLimite();
-                    int max = 1024;
-                    int posicionAleatoria = 1020;//random.nextInt(max - min + 1) + min;
-                    while(!disponibilidad(posicionAleatoria, memoriaPrincipal.getContenido().length, instrucciones.size())){
+                    int max = memoriaPrincipal.getContenido().length - memoriaPrincipal.getSecundaria();
+                    int posicionAleatoria = random.nextInt(max - min + 1) + min;
+                    while(!disponibilidad(posicionAleatoria, max, instrucciones.size())){
                         posicionAleatoria = random.nextInt(max - min + 1) + min;
                     }
                     for(int i = 0; i<instrucciones.size(); i++){
@@ -220,7 +293,25 @@ public class Controlador{
                     JOptionPane.showMessageDialog (null, "Error en la carga del proceso nuevo. Asegurese de que el proceso no contenga errores y de no cargar un proceso vacío", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }else{
-                error();
+                ArrayList<Instruccion> instrucciones;
+                String[] listaTemporal = construirLista();
+                boolean validacion = validarInstruccion(listaTemporal);
+                if(validacion){
+                    instrucciones = construirListaInstrucciones(listaTemporal);
+                    Random random = new Random();
+                    int min = memoriaPrincipal.getContenido().length - memoriaPrincipal.getSecundaria();
+                    int max = memoriaPrincipal.getContenido().length;
+                    int posicionAleatoria = random.nextInt(max - min + 1) + min;
+                    while(!disponibilidad(posicionAleatoria, max, instrucciones.size())){
+                        posicionAleatoria = random.nextInt(max - min + 1) + min;
+                    }
+                    for(int i = 0; i<instrucciones.size(); i++){
+                        memoriaPrincipal.getContenido()[posicionAleatoria]=instrucciones.get(i);
+                        posicionAleatoria++;
+                    }
+                }
+                pp.getTextAreaPantalla().setText("--> La memoria principal ya ha alcanzado su capacidad maxima, el proceso será guardado en la memoria secundaria");
+                actualizarTablaMemoria();
             }
         }
     };
@@ -229,7 +320,8 @@ public class Controlador{
         this.pp = new PantallaPrincipal();
         this.pconfig = new PantallaConfiguracion();
         this.pm = new PantallaMemoria();
-        this.memoriaPrincipal = new Memoria();
+        this.pe = new Estadisticas();
+        ajustes();
         this.ir = "-";
         this.espera = false;
         this.regex = "^(LOAD\\s+(AX|BX|CX|DX)|" +
@@ -244,7 +336,7 @@ public class Controlador{
                "INT\\s+\\d{2}H|" +
                "JMP\\s+[+-]?\\d+|" +
                "CMP\\s+(AX|BX|CX|DX)\\s+(AX|BX|CX|DX)|" +
-               "JE|JNE\\s+[+-]?\\d+|" +
+               "(JE|JNE)\\s+[+-]?\\d+|" +
                "PARAM\\s+-?\\d+(\\s+-?\\d+){0,2}|" +
                "PUSH\\s+(AX|BX|CX|DX)|" +
                "POP\\s+(AX|BX|CX|DX))\\s*$";
@@ -364,14 +456,17 @@ public class Controlador{
                         nuevaInstruccion.setValor2(param2);
                         nuevaInstruccion.setValor3(param3);
                         nuevaInstruccion.setCantidadParam(3);
+                        instrucciones.add(nuevaInstruccion);
                     }else if(division.length == 3){
                         param2 = Integer.parseInt(division[2]);
                         nuevaInstruccion = new Instruccion(division[0], param1, actual);
                         nuevaInstruccion.setValor2(param2);
                         nuevaInstruccion.setCantidadParam(2);
+                        instrucciones.add(nuevaInstruccion);
                     }else{
                         nuevaInstruccion = new Instruccion(division[0], param1, actual);
                         nuevaInstruccion.setCantidadParam(1);
+                        instrucciones.add(nuevaInstruccion);
                     }
                     break;
                 case "PUSH":
@@ -459,8 +554,34 @@ public class Controlador{
         }
     }
 
-    public void error(){
-        pp.getBtnInstruccion().setText("Siguiente Proceso");
+    public void error(int tipo){
+        switch (tipo) {
+            case 1:
+                pp.getTextAreaPantalla().setText("--> ERROR: Imposible acceder a esa posición de la memoria\n");
+                bcpActual.setEstado("Terminado");
+                pp.getBtnInstruccion().setText("Siguiente Proceso");
+                break;
+            case 2:
+                pp.getTextAreaPantalla().setText("--> ERROR: Ha excedido la capacidad de la pila\n");
+                bcpActual.setEstado("Terminado");
+                pp.getBtnInstruccion().setText("Siguiente Proceso");
+                break;
+            case 3:
+                pp.getTextAreaPantalla().setText("--> ERROR: La pila se encuentra vacía\n");
+                bcpActual.setEstado("Terminado");
+                pp.getBtnInstruccion().setText("Siguiente Proceso");
+                break;
+            case 4:
+                pp.getTextAreaPantalla().setText("--> ERROR: Este proceso no cuenta con un final\n");
+                bcpActual.setEstado("Terminado");
+                pp.getBtnInstruccion().setText("Siguiente Proceso");
+                break;
+            default:
+                break;
+        }
+        LocalTime horaActual = LocalTime.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("HH:mm:ss");
+        horaFinal = horaActual.format(formato);
     }
 
     public void inicializarRegistros(){
@@ -668,7 +789,7 @@ public class Controlador{
                     posicionRegistro1 = buscarRegistro("DX");
                     valor = registros[posicionRegistro1].getValor();
                     String impresion = String.valueOf(valor);
-                    pp.getTextAreaPantalla().setText(impresion+"\n");
+                    pp.getTextAreaPantalla().setText("--> " + impresion + "\n");
                 }else{
                     if(espera){
                         posicionRegistro1 = buscarRegistro("DX");
@@ -687,7 +808,11 @@ public class Controlador{
             case "JMP":
                 valor = instruccionActual.getValor();
                 posicionActualizada = posicion + valor;
-                registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                if(posicionActualizada < bcpActual.getFinalMemoria()){
+                    posicion = posicionActualizada-1;
+                }else{
+                    error(1);
+                }
                 break;
             case "CMP":
                 registroOrigen = instruccionActual.getRegistroOrigen();
@@ -702,14 +827,22 @@ public class Controlador{
                 if(cmpResult){
                     valor = instruccionActual.getValor();
                     posicionActualizada = posicion + valor;
-                    registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                    if(posicionActualizada < bcpActual.getFinalMemoria()){
+                        posicion = posicionActualizada-1;
+                    }else{
+                        error(1);
+                    }
                 }
                 break;
             case "JNE":
                 if(!cmpResult){
                     valor = instruccionActual.getValor();
                     posicionActualizada = posicion + valor;
-                    registros[buscarRegistro("PC")].setValor(posicionActualizada);
+                    if(posicionActualizada < bcpActual.getFinalMemoria()){
+                        posicion = posicionActualizada-1;
+                    }else{
+                        error(1);
+                    }
                 }
                 break;
             case "PARAM":
@@ -717,25 +850,25 @@ public class Controlador{
                 param2 = instruccionActual.getValor2();
                 param3 = instruccionActual.getValor3();
                 if(instruccionActual.getCantidadParam() == 3){
-                    if(pila.size()<=5 && pila.size()-3 > 0){
+                    if(pila.size()+3 <= 5){
                         pila.push(param1);
                         pila.push(param2);
                         pila.push(param3);
                     }else{
-                        error();
+                        error(2);
                     }
                 }else if(instruccionActual.getCantidadParam() == 2){
-                    if(pila.size()<=5 && pila.size()-2 > 0){
+                    if(pila.size()+2 <= 5){
                         pila.push(param1);
                         pila.push(param2);
                     }else{
-                        error();
+                        error(2);
                     }
                 }else{
-                    if(pila.size()<=5 && pila.size()-1 > 0){
+                    if(pila.size()+1 <= 5){
                         pila.push(param1);
                     }else{
-                        error();
+                        error(2);
                     }
                 }
                 break;
@@ -746,7 +879,7 @@ public class Controlador{
                     valorActual = registros[posicionRegistro1].getValor();
                     pila.push(valorActual);
                 }else{
-                    error();
+                    error(2);
                 }
                 break;
             case "POP":
@@ -756,7 +889,7 @@ public class Controlador{
                     valorActual = pila.pop();
                     registros[posicionRegistro1].setValor(valorActual);
                 }else{
-                    error();
+                    error(3);
                 }
                 break;
             default:
@@ -766,7 +899,13 @@ public class Controlador{
 
         if(bcpActual.getEstado().equals("Preparado")){
             bcpActual.setEstado("Ejecutando");
+            LocalTime horaActual = LocalTime.now();
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("HH:mm:ss");
+            horaInicio = horaActual.format(formato);
         }else if(bcpActual.getEstado().equals("Terminado")){
+            LocalTime horaActual = LocalTime.now();
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("HH:mm:ss");
+            horaFinal = horaActual.format(formato);
             pp.getBtnInstruccion().setText("Siguiente Proceso");
         }else if(bcpActual.getEstado().equals("Ejecutando")){
             posicion++;
@@ -775,7 +914,7 @@ public class Controlador{
                 Instruccion siguienteInstruccion = (Instruccion) memoriaPrincipal.getContenido()[posicion];
                 ir = siguienteInstruccion.getLinea();
             }else{
-                error();
+                error(4);
             }
         }
         actualizarBcp();
@@ -790,7 +929,44 @@ public class Controlador{
         }
     }
 
+    public void ajustes(){
+        String rutaArchivo = "C:\\Users\\Fabian\\Documents\\NetBeansProjects\\tareaSistemasOperativos\\proyecto-1-fabian_proyecto1_so\\ajustes.txt";
+        try {
+            String contenido = new String(Files.readAllBytes(Paths.get(rutaArchivo)));
+            String[] listaAjustes = contenido.split("\\n");
+            int tamanho = Integer.parseInt(listaAjustes[0].trim());
+            int limite = Integer.parseInt(listaAjustes[1].trim());
+            int secundaria = Integer.parseInt(listaAjustes[2].trim());
+            Object[] contenidoMemoria = new Object[tamanho];
+            this.memoriaPrincipal = new Memoria(contenidoMemoria, limite, secundaria);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void cambiarAjustes(){
+        String rutaArchivo = "C:\\Users\\Fabian\\Documents\\NetBeansProjects\\tareaSistemasOperativos\\proyecto-1-fabian_proyecto1_so\\ajustes.txt";
+        String nuevoTamanho = pconfig.getTamanho().getText();
+        String nuevoLimite = pconfig.getLimite().getText();
+        String nuevaSecundaria = pconfig.getSecundaria().getText();
+        String nuevoContenido = nuevoTamanho + "\n" + nuevoLimite + "\n" + nuevaSecundaria;
+
+        try {
+            Files.write(Paths.get(rutaArchivo), nuevoContenido.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ajustes();
+    }
+
     public void cambioContexto(){
+        this.tiempoEjecucion = 0;
+        this.pila = new Stack<Integer>();
+        this.horaFinal = "";
+        this.horaInicio = "";
+        int id = bcpActual.getId();
+        int inicio = bcpActual.getInicioMemoria();
+        int finalMemoria = bcpActual.getFinalMemoria();
         if(listaBcp.size()>1){
             listaBcp.remove(0);
             bcpActual = listaBcp.get(0);
@@ -803,6 +979,28 @@ public class Controlador{
             actualizarTabla();
         }else{
             bcpActual = null;
+            inicializarRegistros();
         }
+        for(int i = 0; i < memoriaPrincipal.getLimite(); i++){
+            if(memoriaPrincipal.getContenido()[i]!=null){
+                Class<?> objClass = memoriaPrincipal.getContenido()[i].getClass();
+                String clase = objClass.getSimpleName();
+                if(clase.equals("Integer")){
+                    int actual = (int) memoriaPrincipal.getContenido()[i];
+                    if(actual==id){
+                        int cont = i;
+                        while(memoriaPrincipal.getContenido()[cont]!=null){
+                            memoriaPrincipal.getContenido()[cont]=null;
+                            cont++;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        for(int i = inicio; i<finalMemoria; i++){
+            memoriaPrincipal.getContenido()[i]=null;
+        }
+        actualizarTabla();
     }
 }
